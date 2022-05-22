@@ -1,2 +1,2 @@
-# JamHacks-6-MyClass
-Submission for JamHacks 6
+# Hackathon-MyClass
+Submission for Hackathon
