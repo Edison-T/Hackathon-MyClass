@@ -1,0 +1,182 @@
+type User @model {
+  id: ID!
+  name: String!
+  imageUri: String
+  status: String
+  lastOnlineAt: AWSTimestamp
+  role: String
+  expoPushToken: String
+  chatRoomUser: [ChatRoomUser] @connection(keyName: "byUser", fields: ["id"])
+  conversationUser: [ConversationUser] @connection(keyName: "byUser", fields: ["id"])
+  groupRoomUser: [GroupRoomUser] @connection(keyName: "byUser", fields: ["id"])
+  groupRoomConversationUser: [GroupRoomConversationUser] @connection(keyName: "byUser", fields: ["id"])
+  privateRoomUser: [PrivateRoomUser] @connection(keyName: "byUser", fields: ["id"])
+}
+
+type ChatRoomUser 
+@model 
+@key(name: "byUser", fields: ["userID", "chatRoomID"])
+@key(name: "byChatRoom", fields: ["chatRoomID", "userID"]) {
+  id: ID!
+  userID: ID!
+  chatRoomID: String!
+  lastMessageReadTimeStamp: String
+  lastAnnouncementReadTimeStamp: String
+  allowAllNotifications: Boolean
+  allowSelectedNotifications: Boolean
+
+  allowAllConversationNotifications: Boolean
+  allowSelectedConversationNotifications: Boolean
+  # allowReplyNotifications: 
+
+  user: User @connection(fields: ["userID"])
+  chatRoom: ChatRoom @connection(fields: ["chatRoomID"])
+}
+
+type PrivateRoomUser 
+@model 
+@key(name: "byUser", fields: ["userID", "privateRoomID"])
+@key(name: "byPrivateRoom", fields: ["privateRoomID", "userID"]) {
+  id: ID!
+  userID: ID!
+  privateRoomID: ID!
+  allowAllNotifications: Boolean
+  allowSelectedNotifications: Boolean
+  lastMessageReadTimeStamp: String
+  user: User @connection(fields: ["userID"])
+  privateRoom: PrivateRoom @connection(fields: ["privateRoomID"])
+}
+
+type ChatRoom 
+@model 
+@key(fields: ["id"]) {
+  id: String!
+  name: String
+  imageUri: String
+  chatRoomUsers: [ChatRoomUser] @connection(keyName: "byChatRoom", fields: ["id"])
+  messages: [Message] @connection(keyName: "byChatRoom", fields: ["id"])
+  announcements: [Announcement] @connection(keyName: "byChatRoom", fields: ["id"])
+  conversations: [Conversation] @connection(keyName: "byChatRoom", fields: ["id"])
+  lastMessageID: ID
+  lastMessage: Message @connection(fields: ["lastMessageID"])
+  lastAnnouncementID: ID
+  lastAnnouncement: Announcement @connection(fields: ["lastAnnouncementID"])
+  lastAnnouncementTime: String
+}
+
+type PrivateRoom 
+@model {
+  id: ID!
+  privateRoomUsers: [PrivateRoomUser] @connection(keyName: "byPrivateRoom", fields: ["id"])
+  messages: [PrivateRoomMessage] @connection(keyName: "byPrivateRoom", fields: ["id"])
+  lastMessageID: ID
+  lastMessage: PrivateRoomMessage @connection(fields: ["lastMessageID"])
+}
+  
+type Message
+@model
+@key(
+  name: "byChatRoom", 
+  fields: ["chatRoomID", "createdAt"], 
+  queryField : "messagesByChatRoom") {
+  id: ID!
+  replyToMessageID: ID
+  createdAt: String!
+  content: String
+  image: String
+  imageWidth: Int
+  imageHeight: Int
+  audio: String
+  userID: ID!
+  chatRoomID: String!
+  user: User @connection(fields: ["userID"])
+  chatRoom: ChatRoom @connection(fields: ["chatRoomID"])
+}
+
+type PrivateRoomMessage
+@model
+@key(
+  name: "byPrivateRoom", 
+  fields: ["privateRoomID", "createdAt"], 
+  queryField : "messagesByPrivateRoom") {
+  id: ID!
+  replyToMessageID: ID
+  createdAt: String!
+  content: String
+  image: String
+  imageWidth: Int
+  imageHeight: Int
+  audio: String
+  userID: ID!
+  privateRoomID: ID!
+  user: User @connection(fields: ["userID"])
+  privateRoom: PrivateRoom @connection(fields: ["privateRoomID"])
+}
+
+type Announcement
+@model
+@key(
+  name: "byChatRoom", 
+  fields: ["chatRoomID", "createdAt"], 
+  queryField : "announcementsByChatRoom") {
+  id: ID!
+  createdAt: String!
+  dueDate: String
+  content: String
+  title: String
+  userID: ID!
+  chatRoomID: String!
+  user: User @connection(fields: ["userID"])
+  chatRoom: ChatRoom @connection(fields: ["chatRoomID"])
+}
+
+type Conversation
+@model
+@key(
+  name: "byChatRoom", 
+  fields: ["chatRoomID", "createdAt"], 
+  queryField : "conversationsByChatRoom") {
+  id: ID!
+  name: String
+  chatRoomID: String!
+  chatRoom: ChatRoom @connection(fields: ["chatRoomID"])
+  createdAt: String
+  conversationUsers: [ConversationUser] @connection(keyName: "byConversation", fields: ["id"])
+  messages: [ConversationMessage] @connection(keyName: "byConversation", fields: ["id"])
+  lastMessageID: ID
+  lastMessage: ConversationMessage @connection(fields: ["lastMessageID"])
+}
+
+type ConversationMessage
+@model
+@key(
+  name: "byConversation", 
+  fields: ["conversationID", "createdAt"], 
+  queryField : "messagesByConversation") {
+  id: ID!
+  replyToMessageID: ID
+  createdAt: String!
+  content: String
+  image: String
+  imageWidth: Int
+  imageHeight: Int
+  audio: String
+  userID: ID!
+  conversationID: ID!
+  user: User @connection(fields: ["userID"])
+  conversation: Conversation @connection(fields: ["conversationID"])
+}
+
+type ConversationUser 
+@model 
+@key(name: "byUser", fields: ["userID", "conversationID"])
+@key(name: "byConversation", fields: ["conversationID", "userID"]) {
+  id: ID!
+  userID: ID!
+  conversationID: ID!
+  lastMessageReadTimeStamp: String
+  allowAllNotifications: Boolean
+  allowSelectedNotifications: Boolean
+  user: User @connection(fields: ["userID"])
+  conversation: Conversation @connection(fields: ["conversationID"])
+}

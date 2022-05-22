@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "MyClass",
+    "slug": "MyClass",
+    "version": "1.0.4",
+    "orientation": "portrait",
+    "icon": "./assets/MyClass-logo.png",
+    "splash": {
+      "image": "./assets/MyClass-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.EdisonTang.MyClass",
+      "buildNumber": "5"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/MyClass-logo.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/MyClass-logo.png"
+    }
+  }
+}
